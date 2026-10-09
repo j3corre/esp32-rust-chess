@@ -9,6 +9,10 @@ The engine started as a Rust port of [tinychess](https://github.com/Timmy6942025
 a fork of the [Dog](https://github.com/folkertvanheusden/Dog) chess engine by Folkert van
 Heusden, and was then heavily optimised for microcontrollers with 400–512 kB of RAM.
 
+**Website: [esp32.chessbenefits.com](https://esp32.chessbenefits.com/)** – install the firmware
+on your board straight from the browser (Chrome/Edge, no toolchain needed), or
+[play against the engine in your browser](https://esp32.chessbenefits.com/play/) without any board.
+
 ## Features
 
 - **A strong engine on a tiny chip** – alpha-beta search (PVS, transposition table, null move,
@@ -71,6 +75,10 @@ rating. The web app shows the strength rounded down (2700+ / 2600+ / 2550+ / 240
 normal use the board also serves the web app and drives the display.
 
 ## Quick start
+
+No toolchain needed just to use it: the [website](https://esp32.chessbenefits.com/docs/install/)
+flashes ready-made firmware for the ESP32-C3, C6, S3 and the T-Dongle-S3 from the browser.
+The steps below build it from source.
 
 You need a board from the table above and a USB cable **that carries data** (many cheap cables
 only charge).
