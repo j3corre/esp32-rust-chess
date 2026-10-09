@@ -1,0 +1,16 @@
+[package]
+name = "chess-web"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "HTTP layer (picoserve): web app + REST API on top of chess-hub; shared by the board and the simulator"
+
+[dependencies]
+chess-hub = { path = "../chess-hub" }
+# No runtime here – the firmware enables "embassy", the simulator "tokio".
+picoserve = { version = "0.20.1", default-features = false }
+heapless = "0.9"
+
+[build-dependencies]
+flate2 = "1"

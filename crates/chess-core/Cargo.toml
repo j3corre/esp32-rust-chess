@@ -1,0 +1,14 @@
+[package]
+name = "chess-core"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Hardware-independent chess rules (no_std): bitboards, moves, FEN, SAN"
+
+[features]
+# Place hot functions (move generator, legality, make…) in RAM (.rwtext) so that on the ESP32
+# they do not compete with the network weights for the flash cache. Enabled only by the firmware.
+iram = []
+
+[dependencies]

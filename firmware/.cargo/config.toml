@@ -1,0 +1,37 @@
+# Build settings for the ESP32-C6 (RISC-V core).
+# They apply only when cargo is run from the firmware/ directory.
+
+[target.riscv32imac-unknown-none-elf]
+# `cargo run` builds the firmware, flashes it over USB (with the custom partition table)
+# and opens the serial console.
+runner = "espflash flash --monitor --chip esp32c6 --partition-table partitions.csv"
+
+# ESP32-C3 (RV32IMC). Own rustflags – [build].rustflags are ignored for a target that has rustflags.
+[target.riscv32imc-unknown-none-elf]
+runner = "espflash flash --monitor --chip esp32c3 --partition-table partitions.csv"
+rustflags = ["-C", "force-frame-pointers"]
+
+# ESP32-S3 (Xtensa, "esp" toolchain; core/alloc are built with -Zbuild-std by the scripts).
+[target.xtensa-esp32s3-none-elf]
+runner = "espflash flash --monitor --chip esp32s3 --partition-table partitions.csv"
+# -disable-lsr: without loop strength reduction the S3 is ~4 % faster (10,605 vs 11,057
+# cycles/node). The Xtensa backend error "Cannot select: Constant<…>" that LSR triggered in
+# the search loops is also worked around by black_box in chess-engine/src/search.rs.
+rustflags = [
+  "-C", "link-arg=-nostartfiles",
+  "-C", "link-arg=-Wl,--no-warn-rwx-segments",
+  "-C", "llvm-args=-disable-lsr",
+]
+
+[build]
+# Default target – so a plain `cargo build` is enough.
+target = "riscv32imac-unknown-none-elf"
+rustflags = [
+  # Required for readable backtraces on panic (esp-backtrace).
+  "-C", "force-frame-pointers",
+]
+
+[env]
+# Firmware log level (error, warn, info, debug, trace); picoserve only warnings
+# (otherwise 2–3 lines per HTTP connection – USB output slows down the network stack).
+ESP_LOG = "info,picoserve=warn"

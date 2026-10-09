@@ -1,0 +1,12 @@
+# Flash partition table (4 MB) for ESP32 Chess.
+# The application is larger than the default 1 MB partition (NNUE weights 394 kB + Wi-Fi + web),
+# so the "factory" partition takes almost the whole flash.
+# The last partition "chesscfg" holds the saved Wi-Fi (see firmware/src/storage.rs).
+# The subtype must be a standard one (espflash cannot handle custom numbers like 0x99 and
+# crashes), hence "undefined" – the firmware finds the partition by its address 0x3F0000.
+#
+# Name,    Type, SubType, Offset,   Size
+nvs,       data, nvs,     0x9000,   0x6000
+phy_init,  data, phy,     0xf000,   0x1000
+factory,   app,  factory, 0x10000,  0x3E0000
+chesscfg,  data, undefined, 0x3F0000, 0x10000

@@ -1,0 +1,104 @@
+[package]
+name = "esp32-chess"
+version = "0.2.10"
+edition = "2024"
+rust-version = "1.95"
+description = "Chess computer for ESP32-C6 (Waveshare LCD-1.3), ESP32-C3, ESP32-S3 and LilyGO T-Dongle-S3 (Rust + Embassy)"
+license = "MIT"
+
+[[bin]]
+name = "esp32-chess"
+path = "./src/main.rs"
+# The firmware has no tests that run on a PC – the libraries in crates/ are tested instead.
+test = false
+bench = false
+
+[features]
+# Target chip (exactly one) – selects the chip features of the esp-* crates. The default is the
+# Waveshare ESP32-C6-LCD-1.3 with a display; ESP32-C3 / ESP32-S3 without a display:
+#   cargo build --release --no-default-features --features esp32c3 --target riscv32imc-unknown-none-elf
+#   cargo +esp build --release -Zbuild-std=core,alloc --no-default-features --features esp32s3 --target xtensa-esp32s3-none-elf
+# (scripts/unix/*.sh do this based on the CHIP variable).
+default = ["esp32c6", "display"]
+esp32c6 = [
+  "esp-hal/esp32c6", "esp-rtos/esp32c6", "esp-radio/esp32c6", "esp-alloc/esp32c6",
+  "esp-bootloader-esp-idf/esp32c6", "esp-println/esp32c6", "esp-backtrace/esp32c6",
+  "esp-storage/esp32c6", "chess-engine/iram",
+]
+esp32c3 = [
+  "esp-hal/esp32c3", "esp-rtos/esp32c3", "esp-radio/esp32c3", "esp-alloc/esp32c3",
+  "esp-bootloader-esp-idf/esp32c3", "esp-println/esp32c3", "esp-backtrace/esp32c3",
+  "esp-storage/esp32c3", "chess-engine/iram", "chess-engine/small-acc-stack",
+]
+esp32s3 = [
+  "esp-hal/esp32s3", "esp-rtos/esp32s3", "esp-radio/esp32s3", "esp-alloc/esp32s3",
+  "esp-bootloader-esp-idf/esp32s3", "esp-println/esp32s3", "esp-backtrace/esp32s3",
+  "esp-storage/esp32s3", "chess-engine/small-acc-stack", "chess-engine/nnue-iram",
+  "chess-engine/nnue-simd",
+]
+# ST7789 display (Waveshare ESP32-C6-LCD-1.3); without it the game is played only via the web.
+display = ["dep:chess-display", "dep:mipidsi", "dep:embedded-hal-bus", "dep:embedded-graphics"]
+# LilyGO T-Dongle-S3: ESP32-S3 + ST7735 160×80 display (board_tdongle.rs, small renderer).
+#   cargo +esp build --release -Zbuild-std=core,alloc --no-default-features --features tdongle --target xtensa-esp32s3-none-elf
+tdongle = ["esp32s3", "display"]
+# The board as a UCI engine over USB (no Wi-Fi, web or display) for chess GUIs on a PC,
+# bridged by scripts/unix/esp-uci.py.
+uci = []
+
+[dependencies]
+# --- Hardware-independent parts (tested on a PC) ---
+chess-core = { path = "../crates/chess-core" }
+chess-engine = { path = "../crates/chess-engine" }
+chess-hub = { path = "../crates/chess-hub" }
+chess-display = { path = "../crates/chess-display", optional = true }
+chess-web = { path = "../crates/chess-web" }
+
+# --- Espressif bare-metal stack (versions match the esp-generate template) ---
+esp-hal = { version = "~1.2.2", features = ["unstable", "log-04"] }
+esp-rtos = { version = "0.4.0", features = ["esp-radio", "esp-alloc", "embassy", "log-04"] }
+esp-radio = { version = "1.0.0-beta.1", features = ["wifi", "esp-alloc", "unstable", "log-04"] }
+# Creates a separate RTOS thread for the engine (task_create).
+esp-radio-rtos-driver = "0.4.2"
+esp-alloc = "0.11.0"
+esp-bootloader-esp-idf = { version = "0.6.0", features = ["log-04"] }
+esp-println = { version = "0.18.0", features = ["log-04"] }
+esp-backtrace = { version = "0.20.0", features = ["panic-handler", "println"] }
+esp-storage = "0.10.0"
+log = "0.4.27"
+critical-section = "1.2.0"
+# Atomics on the ESP32-C3 too (RV32IMC has no read-modify-write instructions;
+# esp-hal enables "unsafe-assume-single-core" there).
+portable-atomic = { version = "1.15.0", default-features = false }
+
+# --- Async runtime and networking ---
+embassy-executor = { version = "0.10.0", features = ["log"] }
+embassy-time = { version = "0.5.0", features = ["log"] }
+embassy-sync = "0.8.0"
+embassy-futures = "0.1.2"
+embassy-net = { version = "0.9.1", features = ["tcp", "udp", "dhcpv4", "proto-ipv4", "medium-ethernet", "log"] }
+picoserve = { version = "0.20.1", features = ["embassy", "log"] }
+edge-dhcp = "0.8.0"
+edge-captive = "0.8.0"
+edge-nal = "0.7.0"
+edge-nal-embassy = { version = "0.9.0", features = ["udp", "proto-ipv4", "medium-ethernet"] }
+static_cell = "2.1.1"
+heapless = "0.9"
+
+# --- Display ---
+mipidsi = { version = "0.10.0", optional = true }
+embedded-hal-bus = { version = "0.3.0", optional = true }
+embedded-graphics = { version = "0.8.2", optional = true }
+
+[profile.dev]
+# The default debug profile is too slow and too large for a microcontroller.
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1 # a single codegen unit = better optimisation
+debug = 2         # debug info (does not increase the flash image size)
+lto = "fat"
+# The engine needs speed, not small size (the flash has 4 MB).
+opt-level = 3
+
+[profile.release.package.esp-radio]
+opt-level = "s"

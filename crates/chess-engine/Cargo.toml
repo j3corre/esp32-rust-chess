@@ -1,0 +1,28 @@
+[package]
+name = "chess-engine"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Chess engine (Rust port of tinychess/Dog): NNUE + alpha-beta search, no_std"
+
+[features]
+default = []
+# The embedded network is nets/h128-v4-i8.bin (768→128, i8 weights, 8 output buckets).
+# A different network can be selected at build time with the environment variable NNUE_NET=<path>.
+#
+# Hot search functions (search, qsearch, SEE, NNUE…) in RAM (.rwtext); enabled by the firmware only.
+iram = ["chess-core/iram", "nnue-core/iram"]
+# Hot NNUE code in RAM only.
+nnue-iram = ["nnue-core/iram"]
+# Accumulator stack of 16 instead of 32 levels (ESP32-C3: 8 kB more RAM for the heap).
+small-acc-stack = []
+# ESP32-S3 SIMD (PIE) for the accumulator update and evaluate (enabled by the esp32s3 firmware).
+nnue-simd = ["nnue-core/simd-s3"]
+
+[dependencies]
+chess-core = { path = "../chess-core" }
+nnue-core = { path = "../nnue-core" }
+
+[build-dependencies]
+nnue-core = { path = "../nnue-core" }

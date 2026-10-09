@@ -1,0 +1,18 @@
+# Rust build output
+target/
+debug/
+**/*.rs.bk
+*.pdb
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.stackdump
+
+# Web app tests (Playwright)
+node_modules/
+web/test-results/
+web/playwright-report/
+
+# Serial console logs (scripts/unix/monitor.sh)
+/bench-results/

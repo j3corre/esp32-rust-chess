@@ -1,0 +1,6 @@
+# The ESP32-C6 and ESP32-C3 are RISC-V → regular stable Rust is enough. The ESP32-S3 (Xtensa)
+# needs the "esp" toolchain (espup) – the scripts select it with `cargo +esp`, which bypasses this file.
+[toolchain]
+channel = "stable"
+components = ["rust-src", "clippy", "rustfmt"]
+targets = ["riscv32imac-unknown-none-elf", "riscv32imc-unknown-none-elf"]

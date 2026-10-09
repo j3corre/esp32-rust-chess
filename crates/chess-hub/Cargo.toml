@@ -1,0 +1,12 @@
+[package]
+name = "chess-hub"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Network-agnostic game server (no_std): players, challenges, games, clocks, engine queue, JSON API"
+
+[dependencies]
+chess-core = { path = "../chess-core" }
+chess-engine = { path = "../chess-engine" }
+heapless = "0.9"

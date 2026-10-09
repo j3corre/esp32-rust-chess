@@ -1,0 +1,20 @@
+[package]
+name = "chess-sim"
+version = "0.2.10"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "PC development server: the same web app and game logic as the board (for development and Playwright tests) + engine UCI mode"
+
+[[bin]]
+name = "chess-sim"
+path = "src/main.rs"
+
+[dependencies]
+chess-core = { path = "../crates/chess-core" }
+chess-engine = { path = "../crates/chess-engine" }
+chess-hub = { path = "../crates/chess-hub" }
+chess-web = { path = "../crates/chess-web" }
+picoserve = { version = "0.20.1", features = ["tokio"] }
+tokio = { version = "1", features = ["rt", "net", "time", "macros"] }
+heapless = "0.9"

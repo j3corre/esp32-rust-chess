@@ -1,0 +1,22 @@
+[package]
+name = "nnue-core"
+version = "0.1.0"
+edition = "2021"
+description = "NNUE inference for the chess engine (no_std, integer-only, weights read in place)"
+
+[features]
+default = []
+# Enables the minimal FEN parser (`board` module) used by the tests.
+std = []
+# Places hot NNUE functions in RAM (esp-hal `.rwtext` section) so the code does not compete
+# with the weights for the flash cache. ESP32 only.
+iram = []
+# ESP32-S3 SIMD (PIE) for the i8 accumulator update and `evaluate_small` (Xtensa only; needs
+# the `esp` toolchain).
+simd-s3 = []
+
+[dependencies]
+
+[[test]]
+name = "core"
+required-features = ["std"]

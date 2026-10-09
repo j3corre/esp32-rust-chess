@@ -1,0 +1,11 @@
+[package]
+name = "gen-assets"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Development tool: converts SVG chess pieces into small bitmaps for the display (crates/chess-display/src/pieces_data.rs)"
+
+[dependencies]
+resvg = { version = "0.45", default-features = false }

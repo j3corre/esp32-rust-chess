@@ -1,0 +1,10 @@
+[package]
+name = "elf-size"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Development tool: firmware section sizes (flash / static RAM) and main-thread stack check"
+
+[dependencies]

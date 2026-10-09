@@ -1,0 +1,33 @@
+# Workspace for the libraries, the PC simulator and the tools.
+# The firmware (firmware/) is a separate project because it is built for
+# different targets (riscv32imac/riscv32imc-unknown-none-elf, xtensa-esp32s3-none-elf).
+[workspace]
+resolver = "3"
+members = [
+    "crates/chess-core",
+    "crates/chess-engine",
+    "crates/nnue-core",
+    "crates/chess-hub",
+    "crates/chess-display",
+    "crates/chess-web",
+    "sim",
+    "tools/gen-assets",
+    "tools/elf-size",
+]
+exclude = ["firmware"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+
+[profile.dev]
+# Without optimisations the engine is extremely slow (search tests would take minutes).
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

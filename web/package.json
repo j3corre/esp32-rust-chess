@@ -1,0 +1,11 @@
+{
+  "name": "esp32-chess-web",
+  "private": true,
+  "description": "ESP32 Chess web UI – Playwright tests against the simulator (sim/)",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
+}
